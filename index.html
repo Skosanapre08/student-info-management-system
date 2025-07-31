@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Info System</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        input, button { margin: 5px; padding: 8px; }
+        table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h2>Student Information Management</h2>
+    <form id="studentForm">
+        <input type="text" id="name" placeholder="Name" required />
+        <input type="text" id="student_number" placeholder="Student Number" required />
+        <input type="text" id="course" placeholder="Course" required />
+        <button type="submit">Add Student</button>
+    </form>
+    <table id="studentTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Student Number</th>
+                <th>Course</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <script>
+        document.getElementById('studentForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const student_number = document.getElementById('student_number').value;
+            const course = document.getElementById('course').value;
+
+            const response = await fetch('/add-student', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, student_number, course })
+            });
+
+            if (response.ok) {
+                loadStudents();
+                document.getElementById('studentForm').reset();
+            }
+        });
+
+        async function loadStudents() {
+            const res = await fetch('/students');
+            const data = await res.json();
+            const tbody = document.querySelector('#studentTable tbody');
+            tbody.innerHTML = '';
+            data.forEach(s => {
+                const row = `<tr><td>${s.name}</td><td>${s.student_number}</td><td>${s.course}</td></tr>`;
+                tbody.innerHTML += row;
+            });
+        }
+
+        loadStudents();
+    </script>
+</body>
+</html>
